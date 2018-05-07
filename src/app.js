@@ -14,7 +14,7 @@
         if (hash.length > 0) {
             var lock;
             try {
-                lock = atob(hash);
+                lock = Base64.decode(hash);
             } catch(e) {
                 fail = true;
             }
@@ -24,7 +24,7 @@
             }
         }
         getRandomLock(function(lock) {
-            window.location.hash = btoa(lock);
+            window.location.hash = Base64.encode(lock);
             cb(lock);
         });
     }
@@ -35,7 +35,7 @@
             if (sjcl.random.isReady(10)) {
                 while (lock.length < 50) {
                     var r = sjcl.random.randomWords(10)[0];
-                    lock += btoa(r);
+                    lock += Base64.encode(r);
                 }
                 lock = lock.substr(0, 50);
                 callback(lock);
@@ -57,11 +57,14 @@
             encrypted.value = "";
             return;
         }
-        encrypted.value = btoa(sjcl.encrypt(lock, toEncrypt.value));
+        encrypted.value = Base64.encode(sjcl.encrypt(lock, toEncrypt.value));
     }
 
     done_typing(toEncrypt, {
         delay: 200,
+        start: function() {
+            errorDisplay.textContent = "";
+        },
         stop:  setEncrypt,
     });
 
@@ -70,7 +73,7 @@
         errorDisplay.textContent = "";
         var data;
         try {
-            data = sjcl.decrypt(lock, atob(encrypted.value));
+            data = sjcl.decrypt(lock, Base64.decode(encrypted.value));
         } catch (e) {
             errorDisplay.textContent = ""+e;
             return;
