@@ -14,18 +14,20 @@ body {
 #to-encrypt {
   width: 100%;
   max-width: 100%;
+  min-width: 100%;
   padding: 0.5em;
   min-height: 10em;
   font-size: inherit;
-  font-family: monospace;
+  font-family: 'Consolas', monospace;
 }
 
-h1, h2 { margin: 0 0 0.5em 0; }
+h1 { margin: 0 0 0.5em 0; }
+h2 { margin: 0; }
 button { font: inherit; }
 
 #encrypted {
   width: 100%;
-  font-family: monospace;
+  font-family: 'Consolas', monospace;
   font-size: inherit;
   overflow: scroll;
   margin-bottom: 1em;
@@ -43,6 +45,7 @@ button { font: inherit; }
   display: block;
   overflow: auto;
   font-size: 0.8em;
+  font-family: 'Consolas', monospace;
   color: gray;
 }
   </style>
@@ -60,6 +63,14 @@ button { font: inherit; }
   <input id='encrypted'></input>
   <button id='decrypt'>decrypt</button>
   <button id='copy'>copy</button>
+
+
+  <p>
+    <ul>
+      <li>First share the link to this page with your friend.</li>
+      <li>Then press copy and share the text with your friend to let them decrypt the message.</li>
+    </ul>
+  </p>
 
   <script src='dist.js'></script>
 </body>
