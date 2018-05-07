@@ -1,0 +1,58 @@
+<!doctype html5>
+<html>
+<head>
+  <meta charset='utf8'/>
+  <title>pbox</title>
+  <style>
+body {
+  width: 32em;
+  max-width: 100%;
+  margin: 0 auto;
+  font-size: 18px;
+  padding: 1em;
+}
+#to-encrypt {
+  width: calc(100% - 2em);
+  max-width: calc(100% - 2em);
+  padding: 0.5em;
+  min-height: 10em;
+  font-size: inherit;
+  font-family: monospace;
+}
+h1, h2 { margin: 0 0 0.5em 0; }
+#encrypted {
+  width: calc(100% - 2em);
+  font-family: monospace;
+  font-size: inherit;
+  overflow: scroll;
+  margin-bottom: 1em;
+  padding: 0.3em;
+}
+hr { width: calc(100% - 2em); padding: 0; margin: 1em 0; }
+button { font: inherit; }
+#error {
+  display: block;
+  color: red;
+  font-size: 1.2em;
+  padding: 0.5em;
+}
+  </style>
+  <script src='./sjcl.js'></script>
+</head>
+<body>
+  <h1>pbox</h1>
+  <textarea placeholder="type something..." cols='80' id='to-encrypt'></textarea>
+
+  <hr/>
+
+  <h2>encrypted:</h2>
+  <span id='error'></span>
+
+  <input id='encrypted'></input>
+  <button id='decrypt'>decrypt</button>
+  <button id='copy'>copy</button>
+
+
+  <script src='app.js'></script>
+</body>
+</html>
