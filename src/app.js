@@ -94,7 +94,6 @@
         encrypted.value = "";
         getLock(function(h) {
             lock = h;
-            document.getElementById("lock").textContent = h;
             setTimeout(function() {
                 document.getElementById("lockart").dataset.jdenticonValue = h;
                 jdenticon.update("#lockart");
