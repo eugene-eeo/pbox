@@ -8,4 +8,4 @@ proof of concept for (hopefully) friendly and useful cryptography. how to use:
 - friend decrypts secret on webpage
 - encrypted secret is tamper proof
 
-[demo](demo/pbox-screenrec.mov)
+[demo](demo/demo.mp4)
