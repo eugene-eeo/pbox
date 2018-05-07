@@ -1,3 +1,34 @@
+function done_typing(elem, config) {
+    var onStart = config.start || function() {};
+    var onStop  = config.stop  || function() {};
+    var delay   = config.delay || 200;
+
+    var stopped = true;
+    var timeout = null;
+
+    function down(ev) {
+        if (stopped) {
+            onStart(ev);
+            stopped = false;
+        }
+        clearTimeout(timeout);
+    }
+
+    function up(ev) {
+        timeout = setTimeout(function() {
+            timeout = null;
+            stopped = true;
+            onStop(ev);
+        }, delay);
+    }
+
+    elem.addEventListener('keydown', down);
+    elem.addEventListener('keyup', up);
+    return function() {
+        elem.removeEventListener('keydown', down);
+        elem.removeEventListener('keyup', up);
+    };
+}
 "use strict";var sjcl={cipher:{},hash:{},keyexchange:{},mode:{},misc:{},codec:{},exception:{corrupt:function(a){this.toString=function(){return"CORRUPT: "+this.message};this.message=a},invalid:function(a){this.toString=function(){return"INVALID: "+this.message};this.message=a},bug:function(a){this.toString=function(){return"BUG: "+this.message};this.message=a},notReady:function(a){this.toString=function(){return"NOT READY: "+this.message};this.message=a}}};
 sjcl.cipher.aes=function(a){this.s[0][0][0]||this.O();var b,c,d,e,f=this.s[0][4],g=this.s[1];b=a.length;var h=1;if(4!==b&&6!==b&&8!==b)throw new sjcl.exception.invalid("invalid aes key size");this.b=[d=a.slice(0),e=[]];for(a=b;a<4*b+28;a++){c=d[a-1];if(0===a%b||8===b&&4===a%b)c=f[c>>>24]<<24^f[c>>16&255]<<16^f[c>>8&255]<<8^f[c&255],0===a%b&&(c=c<<8^c>>>24^h<<24,h=h<<1^283*(h>>7));d[a]=d[a-b]^c}for(b=0;a;b++,a--)c=d[b&3?a:a-4],e[b]=4>=a||4>b?c:g[0][f[c>>>24]]^g[1][f[c>>16&255]]^g[2][f[c>>8&255]]^g[3][f[c&
 255]]};
@@ -58,3 +89,103 @@ b+'":';d=",";switch(typeof a[b]){case "number":case "boolean":c+=a[b];break;case
 null!=d[3]?b[d[2]]=parseInt(d[3],10):null!=d[4]?b[d[2]]=d[2].match(/^(ct|adata|salt|iv)$/)?sjcl.codec.base64.toBits(d[4]):unescape(d[4]):null!=d[5]&&(b[d[2]]="true"===d[5])}return b},g:function(a,b,c){void 0===a&&(a={});if(void 0===b)return a;for(var d in b)if(b.hasOwnProperty(d)){if(c&&void 0!==a[d]&&a[d]!==b[d])throw new sjcl.exception.invalid("required parameter overridden");a[d]=b[d]}return a},sa:function(a,b){var c={},d;for(d in a)a.hasOwnProperty(d)&&a[d]!==b[d]&&(c[d]=a[d]);return c},ra:function(a,
 b){var c={},d;for(d=0;d<b.length;d++)void 0!==a[b[d]]&&(c[b[d]]=a[b[d]]);return c}};sjcl.encrypt=sjcl.json.encrypt;sjcl.decrypt=sjcl.json.decrypt;sjcl.misc.pa={};sjcl.misc.cachedPbkdf2=function(a,b){var c=sjcl.misc.pa,d;b=b||{};d=b.iter||1E3;c=c[a]=c[a]||{};d=c[d]=c[d]||{firstSalt:b.salt&&b.salt.length?b.salt.slice(0):sjcl.random.randomWords(2,0)};c=void 0===b.salt?d.firstSalt:b.salt;d[c]=d[c]||sjcl.misc.pbkdf2(a,c,b.iter);return{key:d[c].slice(0),salt:c.slice(0)}};
 "undefined"!==typeof module&&module.exports&&(module.exports=sjcl);"function"===typeof define&&define([],function(){return sjcl});
+(function(){
+    'use strict';
+    var hashRegex = /#(.*)$/;
+    function getHash() {
+        // Workaround for Firefox which automatically
+        // decodes the hash fragment [bug:483304]
+        var hash = hashRegex.exec(window.location.href);
+        return hash ? hash[1] : '';
+    }
+
+    function getLock(cb) {
+        var fail = false;
+        var hash = getHash();
+        if (hash.length > 0) {
+            var lock;
+            try {
+                lock = atob(hash);
+            } catch(e) {
+                fail = true;
+            }
+            if (!fail) {
+                cb(lock);
+                return;
+            }
+        }
+        getRandomLock(function(lock) {
+            window.location.hash = btoa(lock);
+            cb(lock);
+        });
+    }
+
+    function getRandomLock(callback) {
+        var lock = "";
+        var checkReady = setInterval(function() {
+            if (sjcl.random.isReady(10)) {
+                while (lock.length < 50) {
+                    var r = sjcl.random.randomWords(10)[0];
+                    lock += btoa(r);
+                }
+                lock = lock.substr(0, 50);
+                callback(lock);
+                clearInterval(checkReady);
+            }
+        }, 10);
+    }
+
+    var lock = null;
+    var toEncrypt    = document.getElementById("to-encrypt");
+    var encrypted    = document.getElementById("encrypted");
+    var decryptBtn   = document.getElementById("decrypt");
+    var copyBtn      = document.getElementById("copy");
+    var errorDisplay = document.getElementById("error");
+
+    function setEncrypt() {
+        if (lock === null) return;
+        if (toEncrypt.value === "") {
+            encrypted.value = "";
+            return;
+        }
+        encrypted.value = btoa(sjcl.encrypt(lock, toEncrypt.value));
+    }
+
+    done_typing(toEncrypt, {
+        delay: 200,
+        stop:  setEncrypt,
+    });
+
+    decryptBtn.onclick = function() {
+        if (lock === null) return;
+        errorDisplay.textContent = "";
+        var data;
+        try {
+            data = sjcl.decrypt(lock, atob(encrypted.value));
+        } catch (e) {
+            errorDisplay.textContent = ""+e;
+            return;
+        }
+        toEncrypt.value = data;
+    };
+
+    copyBtn.onclick = function() {
+        if (lock === null) return;
+        setEncrypt();
+        encrypted.focus();
+        encrypted.select();
+        document.execCommand('copy');
+    };
+
+    function onHashChange() {
+        toEncrypt.value = "";
+        encrypted.value = "";
+        getLock(function(h) {
+            document.getElementById("lock").textContent = h;
+            lock = h;
+        });
+    }
+
+    onHashChange();
+    window.addEventListener('hashchange', onHashChange);
+})();

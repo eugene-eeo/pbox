@@ -44,65 +44,57 @@
         }, 10);
     }
 
-    function debounce(func, delay) {
-        var timeout;
-        return function() {
-            if (!timeout) func();
-            clearTimeout(timeout);
-            timeout = setTimeout(function() {
-                timeout = null;
-                func();
-            }, delay);
-        };
-    }
-
     var lock = null;
-    var toEncrypt  = document.getElementById("to-encrypt");
-    var encrypted  = document.getElementById("encrypted");
-    var decryptBtn = document.getElementById("decrypt");
-    var copyBtn    = document.getElementById("copy");
-    var dataCache;
+    var toEncrypt    = document.getElementById("to-encrypt");
+    var encrypted    = document.getElementById("encrypted");
+    var decryptBtn   = document.getElementById("decrypt");
+    var copyBtn      = document.getElementById("copy");
+    var errorDisplay = document.getElementById("error");
 
-    var setEncrypt = debounce(function() {
+    function setEncrypt() {
         if (lock === null) return;
-        var data = toEncrypt.value;
-        if (data === dataCache) {
+        if (toEncrypt.value === "") {
+            encrypted.value = "";
             return;
         }
-        encrypted.value = btoa(sjcl.encrypt(lock, data));
-        dataCache = data;
-    }, 200);
+        encrypted.value = btoa(sjcl.encrypt(lock, toEncrypt.value));
+    }
 
-    toEncrypt.addEventListener('keyup', setEncrypt);
-    setEncrypt();
+    done_typing(toEncrypt, {
+        delay: 200,
+        stop:  setEncrypt,
+    });
 
     decryptBtn.onclick = function() {
-        setEncrypt();
         if (lock === null) return;
+        errorDisplay.textContent = "";
         var data;
         try {
             data = sjcl.decrypt(lock, atob(encrypted.value));
         } catch (e) {
-            document.getElementById("error").textContent = ""+e;
+            errorDisplay.textContent = ""+e;
             return;
         }
-        dataCache = data;
         toEncrypt.value = data;
     };
 
     copyBtn.onclick = function() {
+        if (lock === null) return;
+        setEncrypt();
         encrypted.focus();
         encrypted.select();
         document.execCommand('copy');
     };
 
-    function hashChange() {
+    function onHashChange() {
+        toEncrypt.value = "";
+        encrypted.value = "";
         getLock(function(h) {
-            document.getElementById("lock-hash").textContent = h;
+            document.getElementById("lock").textContent = h;
             lock = h;
         });
     }
 
-    hashChange();
-    window.addEventListener('hashchange', hashChange);
+    onHashChange();
+    window.addEventListener('hashchange', onHashChange);
 })();
