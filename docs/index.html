@@ -21,8 +21,7 @@ body {
   font-family: 'Consolas', monospace;
 }
 
-h1 { margin: 0 0 0.5em 0; }
-h2 { margin: 0; }
+h1, h2 { margin: 0; }
 button { font: inherit; }
 
 #encrypted {
@@ -51,8 +50,13 @@ button { font: inherit; }
   </style>
 </head>
 <body>
-  <h1>pbox</h1>
-  <code id='lock'></code>
+  <center>
+    <h1>pbox</h1>
+    <svg id='lockart' data-jdenticon-value="" width="80" height="80"></svg>
+    <code id='lock'></code>
+  </center>
+  <hr/>
+
   <textarea placeholder="type something..." cols='80' id='to-encrypt'></textarea>
 
   <hr/>
@@ -61,8 +65,7 @@ button { font: inherit; }
   <span id='error'></span>
 
   <input id='encrypted'></input>
-  <button id='decrypt'>decrypt</button>
-  <button id='copy'>copy</button>
+  <button id='decrypt'>decrypt</button><button id='copy'>copy</button>
 
   <p>
     <ul>
@@ -71,6 +74,7 @@ button { font: inherit; }
     </ul>
   </p>
 
+  <script src="https://cdn.jsdelivr.net/npm/jdenticon@2.1.0"></script>
   <script src='dist.js'></script>
 </body>
 </html>

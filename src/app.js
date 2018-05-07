@@ -90,8 +90,12 @@
         toEncrypt.value = "";
         encrypted.value = "";
         getLock(function(h) {
-            document.getElementById("lock").textContent = h;
             lock = h;
+            document.getElementById("lock").textContent = h;
+            setTimeout(function() {
+                document.getElementById("lockart").dataset.jdenticonValue = h;
+                jdenticon.update("#lockart");
+            }, 0);
         });
     }
 
