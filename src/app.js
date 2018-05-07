@@ -33,11 +33,11 @@
         var lock = "";
         var checkReady = setInterval(function() {
             if (sjcl.random.isReady(10)) {
-                while (lock.length < 50) {
+                while (lock.length < 30) {
                     var r = sjcl.random.randomWords(10)[0];
                     lock += Base64.encode(r);
                 }
-                lock = lock.substr(0, 50);
+                lock = lock.substr(0, 30);
                 callback(lock);
                 clearInterval(checkReady);
             }
@@ -57,7 +57,9 @@
             encrypted.value = "";
             return;
         }
-        encrypted.value = Base64.encode(sjcl.encrypt(lock, toEncrypt.value));
+        var s = JSON.parse(sjcl.encrypt(lock, toEncrypt.value));
+        console.log(s);
+        encrypted.value = s.ct + ":" + s.iv + ":" + s.salt;
     }
 
     done_typing(toEncrypt, {
@@ -71,9 +73,26 @@
     decryptBtn.onclick = function() {
         if (lock === null) return;
         errorDisplay.textContent = "";
+        var chunks = encrypted.value.split(':');
+        if (chunks.length !== 3) {
+            errorDisplay.textContent = "bad data";
+            return;
+        }
+        var o = JSON.stringify({
+            adata: "",
+            cipher: "aes",
+            ct: chunks[0],
+            iter: 10000,
+            iv: chunks[1],
+            ks: 128,
+            mode: "ccm",
+            salt: chunks[2],
+            ts: 64,
+            v: 1
+        });
         var data;
         try {
-            data = sjcl.decrypt(lock, Base64.decode(encrypted.value));
+            data = sjcl.decrypt(lock, o);
         } catch (e) {
             errorDisplay.textContent = ""+e;
             return;
