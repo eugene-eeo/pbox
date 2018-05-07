@@ -36,11 +36,17 @@ button { font: inherit; }
   font-size: 1.2em;
   padding: 0.5em;
 }
+#lock-hash {
+  display: block;
+  font-size: 0.8em;
+  color: gray;
+}
   </style>
   <script src='./sjcl.js'></script>
 </head>
 <body>
   <h1>pbox</h1>
+  <code id='lock-hash'></code>
   <textarea placeholder="type something..." cols='80' id='to-encrypt'></textarea>
 
   <hr/>

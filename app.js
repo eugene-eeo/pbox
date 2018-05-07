@@ -77,6 +77,7 @@
     setEncrypt();
 
     decryptBtn.onclick = function() {
+        setEncrypt();
         if (lock === null) return;
         var data;
         try {
@@ -97,6 +98,7 @@
 
     function hashChange() {
         getLock(function(h) {
+            document.getElementById("lock-hash").textContent = h;
             lock = h;
         });
     }
