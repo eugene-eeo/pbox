@@ -36,52 +36,32 @@
     var errorDisplay = document.getElementById("error");
 
     function setEncrypt() {
+        errorDisplay.textContent = "";
         if (lockInput.value === "") return;
         if (toEncrypt.value === "") {
             encrypted.value = "";
             return;
         }
-        var s = JSON.parse(sjcl.encrypt(lockInput.value, toEncrypt.value));
-        encrypted.value = s.ct + ":" + s.iv + ":" + s.salt;
+        encrypted.value = encrypt(lockInput.value, toEncrypt.value);
     }
 
-    done_typing(toEncrypt, {
-        delay: 200,
-        start: function() {
-            errorDisplay.textContent = "";
-        },
-        stop:  setEncrypt,
-    });
+    toEncrypt.onchange = setEncrypt;
 
-    decryptBtn.onclick = function() {
+    function decryptNow() {
         if (lockInput.value === "") return;
         errorDisplay.textContent = "";
-        var chunks = encrypted.value.split(':');
-        if (chunks.length !== 3) {
-            errorDisplay.textContent = "bad data";
-            return;
-        }
-        var o = JSON.stringify({
-            adata: "",
-            cipher: "aes",
-            ct: chunks[0],
-            iter: 10000,
-            iv: chunks[1],
-            ks: 128,
-            mode: "ccm",
-            salt: chunks[2],
-            ts: 64,
-            v: 1
-        });
         var data;
         try {
-            data = sjcl.decrypt(lockInput.value, o);
+            data = decrypt(lockInput.value, encrypted.value);
         } catch (e) {
             errorDisplay.textContent = ""+e;
             return;
         }
         toEncrypt.value = data;
     };
+
+    encrypted.onchange = decryptNow;
+    decryptBtn.onclick = decryptNow;
 
     copyBtn.onclick = function() {
         if (lock === null) return;
