@@ -47,9 +47,8 @@ button { font: inherit; }
 
 #lock {
   overflow: auto;
-  font-size: 0.8em;
+  font-size: 1em;
   font-family: 'Consolas', monospace;
-  color: gray;
 }
   </style>
 </head>
@@ -57,7 +56,7 @@ button { font: inherit; }
   <center>
     <h1>pbox</h1>
     <svg id='lockart' width="80" height="80"></svg>
-    key: <input id='lock' placeholder='key'></input>
+    <b>key:</b> <input id='lock' placeholder='key'></input>
   </center>
   <hr/>
 
@@ -71,13 +70,11 @@ button { font: inherit; }
   <input id='encrypted'></input>
   <button id='decrypt'>decrypt</button><button id='copy'>copy</button>
 
-  <p>
-    <ul>
-      <li>get your friend to visit this page.</li>
-      <li>share the key with a friend.</li>
-      <li>then press copy and share it to let them decrypt the message.</li>
-    </ul>
-  </p>
+  <ul>
+    <li>get your friend to visit this page.</li>
+    <li>share the key with a friend.</li>
+    <li>then press copy and share it with them so they can decrypt the message.</li>
+  </ul>
 
   <script src="https://cdn.jsdelivr.net/npm/jdenticon@2.1.0"></script>
   <script src='dist.js'></script>
