@@ -1,30 +1,14 @@
 (function(){
     'use strict';
-    var hashRegex = /#(.*)$/;
-    function getHash() {
-        // Workaround for Firefox which automatically
-        // decodes the hash fragment [bug:483304]
-        var hash = hashRegex.exec(window.location.href);
-        return hash ? hash[1] : '';
-    }
 
     function getLock(cb) {
-        var fail = false;
-        var hash = getHash();
+        var hash = lockInput.value;
         if (hash.length > 0) {
-            var lock;
-            try {
-                lock = Base64.decode(hash);
-            } catch(e) {
-                fail = true;
-            }
-            if (!fail) {
-                cb(lock);
-                return;
-            }
+            cb(hash);
+            return;
         }
         getRandomLock(function(lock) {
-            window.location.hash = Base64.encode(lock);
+            lockInput.value = lock;
             cb(lock);
         });
     }
@@ -44,7 +28,7 @@
         }, 10);
     }
 
-    var lock = null;
+    var lockInput    = document.getElementById("lock");
     var toEncrypt    = document.getElementById("to-encrypt");
     var encrypted    = document.getElementById("encrypted");
     var decryptBtn   = document.getElementById("decrypt");
@@ -52,12 +36,12 @@
     var errorDisplay = document.getElementById("error");
 
     function setEncrypt() {
-        if (lock === null) return;
+        if (lockInput.value === "") return;
         if (toEncrypt.value === "") {
             encrypted.value = "";
             return;
         }
-        var s = JSON.parse(sjcl.encrypt(lock, toEncrypt.value));
+        var s = JSON.parse(sjcl.encrypt(lockInput.value, toEncrypt.value));
         encrypted.value = s.ct + ":" + s.iv + ":" + s.salt;
     }
 
@@ -70,7 +54,7 @@
     });
 
     decryptBtn.onclick = function() {
-        if (lock === null) return;
+        if (lockInput.value === "") return;
         errorDisplay.textContent = "";
         var chunks = encrypted.value.split(':');
         if (chunks.length !== 3) {
@@ -91,7 +75,7 @@
         });
         var data;
         try {
-            data = sjcl.decrypt(lock, o);
+            data = sjcl.decrypt(lockInput.value, o);
         } catch (e) {
             errorDisplay.textContent = ""+e;
             return;
@@ -107,18 +91,15 @@
         document.execCommand('copy');
     };
 
-    function onHashChange() {
-        toEncrypt.value = "";
-        encrypted.value = "";
+    function onChange() {
         getLock(function(h) {
-            lock = h;
-            document.getElementById("lock").textContent = h;
-            setTimeout(function() {
-                document.getElementById("lockart").innerHTML = jdenticon.toSvg(h, 80);
-            }, 0);
+            document.getElementById("lockart").innerHTML = jdenticon.toSvg(h, 80);
+            setEncrypt();
         });
-    }
+    };
 
-    onHashChange();
-    window.addEventListener('hashchange', onHashChange);
+    onChange();
+    lockInput.onchange = onChange;
+    toEncrypt.value = "";
+    encrypted.value = "";
 })();
