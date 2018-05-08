@@ -113,6 +113,9 @@
         getLock(function(h) {
             lock = h;
             document.getElementById("lock").textContent = h;
+            setTimeout(function() {
+                document.getElementById("lockart").innerHTML = jdenticon.toSvg(h, 80);
+            }, 0);
         });
     }
 
