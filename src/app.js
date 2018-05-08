@@ -58,7 +58,6 @@
             return;
         }
         var s = JSON.parse(sjcl.encrypt(lock, toEncrypt.value));
-        console.log(s);
         encrypted.value = s.ct + ":" + s.iv + ":" + s.salt;
     }
 
@@ -113,10 +112,7 @@
         encrypted.value = "";
         getLock(function(h) {
             lock = h;
-            setTimeout(function() {
-                document.getElementById("lockart").dataset.jdenticonValue = h;
-                jdenticon.update("#lockart");
-            }, 0);
+            document.getElementById("lock").textContent = h;
         });
     }
 
