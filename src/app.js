@@ -28,14 +28,18 @@
         }, 10);
     }
 
-    var lockInput    = document.getElementById("lock");
-    var toEncrypt    = document.getElementById("to-encrypt");
-    var encrypted    = document.getElementById("encrypted");
-    var decryptBtn   = document.getElementById("decrypt");
-    var copyBtn      = document.getElementById("copy");
-    var errorDisplay = document.getElementById("error");
+    function $(q) {
+        return document.querySelector(q);
+    }
 
-    function setEncrypt() {
+    var lockInput    = $("#lock");
+    var toEncrypt    = $("#to-encrypt");
+    var encrypted    = $("#encrypted");
+    var decryptBtn   = $("#decrypt");
+    var copyBtn      = $("#copy");
+    var errorDisplay = $("#error");
+
+    function encryptNow() {
         errorDisplay.textContent = "";
         if (lockInput.value === "") return;
         if (toEncrypt.value === "") {
@@ -44,8 +48,6 @@
         }
         encrypted.value = encrypt(lockInput.value, toEncrypt.value);
     }
-
-    toEncrypt.onchange = setEncrypt;
 
     function decryptNow() {
         if (lockInput.value === "") return;
@@ -58,28 +60,27 @@
             return;
         }
         toEncrypt.value = data;
-    };
+    }
 
+    toEncrypt.onchange = encryptNow;
     encrypted.onchange = decryptNow;
     decryptBtn.onclick = decryptNow;
 
     copyBtn.onclick = function() {
         if (lock === null) return;
-        setEncrypt();
+        encryptNow();
         encrypted.focus();
         encrypted.select();
         document.execCommand('copy');
     };
 
-    function onChange() {
+    function keyChange() {
         getLock(function(h) {
             document.getElementById("lockart").innerHTML = jdenticon.toSvg(h, 80);
-            setEncrypt();
+            encryptNow();
         });
-    };
+    }
 
-    onChange();
-    lockInput.onchange = onChange;
-    toEncrypt.value = "";
-    encrypted.value = "";
+    keyChange();
+    lockInput.onchange = keyChange;
 })();

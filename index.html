@@ -15,15 +15,17 @@ body {
 #to-encrypt {
   width: 100%;
   max-width: 100%;
-  min-width: 100%;
+  resize: vertical;
   padding: 0.5em;
   min-height: 10em;
   font-size: inherit;
   font-family: 'Consolas', monospace;
+  margin: 1em 0;
 }
 
 h1, h2 { margin: 0; }
 button { font: inherit; }
+input  { height: 1.8em; }
 
 #encrypted {
   width: 100%;
@@ -58,11 +60,8 @@ button { font: inherit; }
     <svg id='lockart' width="80" height="80"></svg>
     <b>key:</b> <input id='lock' placeholder='key'></input>
   </center>
-  <hr/>
 
   <textarea placeholder="type something..." cols='80' id='to-encrypt'></textarea>
-
-  <hr/>
 
   <h2>encrypted:</h2>
   <span id='error'></span>
